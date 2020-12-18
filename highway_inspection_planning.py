@@ -138,21 +138,25 @@ def barplot_accidents(accidents, ref_files, ylabel, groupby='JAAR_VKL', ref_file
     plt.show()
 
 
-
-
+###### BELOW YOU CAN FIND ELEMENTS OF THE ACTUAL KNOWLEDGE BASED SYSTEM ######
 
 
 def retrieve_accident_by_ID(data, accident_ID):
+    """This function creates an object of the Accident class.
+       It queries the accidents dataframe to obtain the unique accident and related data, i.e. parties and road segment"""
     accidents, parties, roadsegments, ref_files = data
     accident_dict = accidents[accidents.index.astype(str)==str(accident_ID)].T.to_dict()[accident_ID]
     return Accident(accident_dict, accident_ID, data)
 
 def retrieve_road_segment_by_ID(data, roadsegment_ID):
+    """This function creates an object of the Roadsegment class.
+       It queries the roadsegments dataframe to obtain the unique roadsegment and related data"""
     accidents, parties, roadsegments, ref_files = data    
     roadsegment_dict = find_road_segment(data, roadsegment_ID)
     return Roadsegment(roadsegment_dict, roadsegment_ID, data)
     
 def find_road_segment(data, roadsegment_ID):
+    """Helper function to obtain unique roadsegment"""
     accidents, parties, roadsegments, ref_files = data
     wegvak = roadsegments[roadsegments['WVK_ID']==roadsegment_ID] 
     if wegvak.shape[0] > 0:
@@ -161,6 +165,9 @@ def find_road_segment(data, roadsegment_ID):
         return {}
     
 def find_accidents_on_roadsegment(data, roadsegment_ID):
+    """This function finds all accidents that happend on a specific road segment.
+       It could be further extended to be able to filter on specific time periods or add additional constraints.
+       The result is retured in a list of Accidents objects"""
     accidents, parties, roadsegments, ref_files = data    
     roadsegment = find_road_segment(data, roadsegment_ID)
     accidents_on_roadsegment = accidents[accidents['WVK_ID']==roadsegment_ID].T.to_dict()
@@ -172,6 +179,10 @@ def find_accidents_on_roadsegment(data, roadsegment_ID):
     return accidents_on_roadsegment_objects
 
 def find_parties(data, accident_ID):
+    """This function finds all parties involved in a specific accident.
+       There is no Party object in HIP. Instead individual parties are stored as dictionaries.
+       The reference files are used to enrich the data to descriptions instead of just ID's.
+       This helps to make the system user-friendly and the outputs human readible"""
     accidents, parties, roadsegments, ref_files = data    
     parties_involved = parties[parties['VKL_NUMMER'].astype(str)==str(accident_ID)].T.to_dict()
     
@@ -183,6 +194,7 @@ def find_parties(data, accident_ID):
     return parties_involved
 
 def determine_value(ID, reference_file):
+    """ Helper function to use reference files and convert IDs to descriptions"""
     try:
         ID = int(ID)
         return reference_file.loc[ID][0]
