@@ -58,6 +58,9 @@ def import_data(foldername):
     return accidents_source, parties_source, wegvakken, ref_files
 
 def create_intended_movements_ref_file():
+    """The intended movements are not included in the refernece files.
+       Instead it can only be understood by using the explanation from the Dutch pdf manual.
+       To keep consistent the intended movements are converted to a reference file too."""
     df_intended_movements = pd.DataFrame(
     [[1, 'Oversteken'],
     [2, 'Vooruit'],
@@ -74,15 +77,22 @@ def create_intended_movements_ref_file():
     return df_intended_movements
 
 def save_data(filename, data):
+    """To optimize system usage, data can be stored in Python format in pickle files.
+       This function saves the data to a pickle file"""
     with open(filename, 'wb') as f:
         pickle.dump(data, f)
 
 def open_data(filename):
+    """To optimize system usage, data can be stored in Python format in pickle files.
+       This function opens the data from a pickle file"""
     with open(filename, 'rb') as f:
         data = pickle.load(f)
     return data
 
 def load_fields_descriptions(descriptions_filename):
+    """Using the provided Excel with field names the file can be imported and converted to Python format.
+       The field names descriptions are stored in a dictionary. 
+       They can then later be used to print the information from the BRON database in a human-readible format"""
     descriptions_accidents = pd.read_excel(descriptions_filename, sheet_name='accidents')
     descriptions_accidents['Naam'] = descriptions_accidents['Naam'].apply(str.upper)
     descriptions_accidents = descriptions_accidents[['Naam','Definitie NL']]
@@ -104,6 +114,7 @@ def load_fields_descriptions(descriptions_filename):
     return dict_descriptions_accidents, dict_descriptions_roadsegments, dict_descriptions_parties
 
 def barplot_parties(parties, ref_files, ylabel, groupby='OTE_ID', ref_file=False, description_var=False):
+    """For data visualisation purposes this function can create simple bar plots for any of the variables of parties"""
     import matplotlib.pyplot as plt
     objecttypes_count = parties.groupby(groupby)['VKL_NUMMER'].count()
     objecttypes_count = objecttypes_count.sort_values(ascending=True)
@@ -115,6 +126,7 @@ def barplot_parties(parties, ref_files, ylabel, groupby='OTE_ID', ref_file=False
     plt.show()
 
 def barplot_accidents(accidents, ref_files, ylabel, groupby='JAAR_VKL', ref_file=False, description_var=False):
+    """For data visualisation purposes this function can create simple bar plots for any of the variables of accidents"""
     import matplotlib.pyplot as plt
     objecttypes_count = accidents.groupby(groupby)['WVK_ID'].count()
     objecttypes_count = objecttypes_count.sort_values(ascending=True)
