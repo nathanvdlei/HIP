@@ -2,7 +2,7 @@
 ### Background:
 This project presents the Highway Inspection Planning (HIP) prototype. The main idea here is to be able to use the publically available accidents dataset called BRON to assess the likelihood a specific accident caused damage to the Dutch highway system. This information can then be used to optimize inspection plannings for maintenance contractors.
 
-This repository was developed for the Knowledge Engineering course (2020-2021) at the Vrije Universitieit (VU) in Amsterdam. The CommonKADS model was applied to achieve the strucutre demonstrated in this prototype.
+This repository was developed for the Knowledge Engineering course (2020-2021) at the Vrije Universitieit (VU) in Amsterdam. The CommonKADS model was applied to achieve the structure demonstrated in this prototype.
 
 
 ### How to use:
