@@ -6,8 +6,8 @@ This repository was developed for the Knowledge Engineering course (2020-2021) a
 
 
 ### How to use:
-Step 1: To use the application download a accident dataset yourself from the BRON database:
-    https://data.overheid.nl/dataset/9841-verkeersongevallen---bestand-geregistreerde-ongevallen-nederland
+Step 1: To use the application download the one of the accident dataset yourself from the BRON database:
+    https://data.overheid.nl/dataset/9841-verkeersongevallen---bestand-geregistreerde-ongevallen-nederland. We have tested compatebility with the 2010-2019 version.
 
 Step 2: Download the HIP project to your local machine
 
