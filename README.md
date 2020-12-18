@@ -13,6 +13,6 @@ Step 2: Download the HIP project to your local machine
 
 Step 3: Open the DEMO Jupyter Notebook to interact with the data
 
-Step 4: Change the file location of the dataset to your local copy of the database from step 1.
+Step 4: Change the file location of the dataset to your local copy of the database from step 1. Change the file location of the field name descriptions file to the location on your machine.
 
 Step 5: You can interact with the knowledge based HIP system using the DEMO notebook
