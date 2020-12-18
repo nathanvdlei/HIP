@@ -22,3 +22,7 @@ Step 5: You can interact with the knowledge based HIP system using the DEMO note
 The HIP.py file contains some general input functions. The data itself, i.e. accidents, road segments and parties, are imported from the downloaded csv files and are stored in Pandas dataframes.  The BRON database is structured in such a way that reference files are used to explain specific variable IDs. The reference files are all downloaded and stored in a dictionary ref_files. 
 
 The HIP.py file also contains two classes: Accident and Roadsegment. These classes are the object-oriented approach to the assesment and planning tasks. The expected damage assesment is performed in HIP.Accident.assesment_task_assess_damage_level(). The planning task is not yet implemented, but it is possible to print the accidents with abstracted features that happend on a specific road segment using HIP.Roadsegment.print_accidents_on_roadsegment_details()
+
+If anything is unclear, the database manual is included (in Dutch) to help you guide through the database. Please note that all the information is georeferenced to, so the work could be extended to visualize the information using GIS software. 
+
+For questions feel free to contact the developers.
