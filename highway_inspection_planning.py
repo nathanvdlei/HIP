@@ -214,6 +214,9 @@ extract_first_n_accidents = 20
 
 class Accident():
     def __init__(self, dictionary, ID, data, roadsegment=False):
+        """The initialisation function for Acccidents recombines all information into an easy usable object.
+           The accident ID is used to find all parties that were involved in the accident. 
+           The roadsegment ID is used to link the accident to the corresponding roadsegment."""
         accidents, parties, roadsegments, ref_files = data
         self.accident = dictionary
         self.accident['WVG_OMS'] = determine_value(self.accident['WVG_ID'], ref_files['wegverhardingen'])
@@ -232,6 +235,7 @@ class Accident():
         self.assesment_task_assess_damage_level()
 
     def print_accident_details(self, fields_descriptions, fields_to_print):
+        """Printing function"""
         dict_descriptions_accidents, dict_descriptions_roadsegments, dict_descriptions_parties = fields_descriptions
         fields_to_print_accidents, fields_to_print_parties, fields_to_print_roadsegments = fields_to_print
         print('------------------------------------------------')
@@ -242,6 +246,7 @@ class Accident():
         print('------------------------------------------------')
 
     def print_parties_details(self, fields_descriptions, fields_to_print):
+        """Printing function"""
         dict_descriptions_accidents, dict_descriptions_roadsegments, dict_descriptions_parties = fields_descriptions
         fields_to_print_accidents, fields_to_print_parties, fields_to_print_roadsegments = fields_to_print
         print(BOLD+f'Parties data ({self.n_parties} parties)'+END)
@@ -255,6 +260,7 @@ class Accident():
         print('------------------------------------------------')
         
     def print_roadsegment_details(self, fields_descriptions, fields_to_print):
+        """Printing function"""
         dict_descriptions_accidents, dict_descriptions_roadsegments, dict_descriptions_parties = fields_descriptions
         fields_to_print_accidents, fields_to_print_parties, fields_to_print_roadsegments = fields_to_print
         print(BOLD+'Road segment data'+END)
@@ -265,6 +271,7 @@ class Accident():
 
 
     def abstract_involves_element_from_road(self):
+        """This abstraction step abstracts the fact whether the accident involved an element from the road"""
         elements_from_road = ['Boom', 'Lichtmast', 'Overig vast object', 'Overig wegmeubilair']
         for party_id, party_dict in self.parties.items():
             if party_dict['OTE_OMS'] in elements_from_road:
@@ -273,6 +280,7 @@ class Accident():
         self.involves_element_from_road = False
         
     def abstract_involves_heavy_object(self):
+        """This abstraction step abstracts the fact whether the accident involved a heavy object as one of the parties"""
         self.involves_heavy_object = False
         heavy_objects = ['Vrachtauto', 'Trekker', 'Trekker met oplegger', 'Landbouwvoertuig']
         for party_id, party_dict in self.parties.items():
@@ -282,6 +290,7 @@ class Accident():
         self.involves_heavy_object = False
 
     def abstract_determine_scale_accident(self):
+        """This abstraction step abstracts the scale of the accident, i.e. how many parties were involved"""
         if self.n_parties < 3:
             self.scale_accident = 'small'        
         elif self.n_parties == 3 or self.n_parties == 4:
@@ -290,6 +299,8 @@ class Accident():
             self.scale_accident = 'large'   
             
     def abstract_involves_damaging_movement(self):
+        """This abstraction step abstracts the fact wheter the accident involved any 
+           parties that underwent any damaging movements during the accident"""
         damaging_movements = ['Kantelen', 'Over de kop', 'Uitrollen']
         self.involves_damaging_movement = False
         for party_id, party_dict in self.parties.items():
@@ -299,12 +310,18 @@ class Accident():
         self.involves_damaging_movement = False
     
     def abstract_determine_happend_on_highway(self):
+        """ For filtering purposes this function is an abstraction that double checks whether 
+            the accident actually happend on the highway. 
+            Accidents of the highway are out of scope of this project"""
         if self.accident['HECTOMETER'] != 'nan':
             self.happend_on_highway = True
         else:
             self.happend_on_highway = False
     
     def abstract(self, print_log=True):
+        """This function relates directly to the abstraction inference step in the assessment inference model.
+           It consist of multiple abstractions that are each implemented in their own function. 
+           Many more abstractions could be added in the future."""
         self.abstract_determine_happend_on_highway()
         self.abstract_involves_element_from_road()
         self.abstract_involves_heavy_object()
@@ -313,6 +330,7 @@ class Accident():
         self.abstract_involves_damaging_movement()
 
     def print_abstractions(self):
+        """For testing and demonstration purposes this function prints the abstractions that were made for this accident."""
         print('The following abstractions were made:')
         if self.happend_on_highway:
             print(f'  -  Accident happend on the highway')
@@ -332,10 +350,17 @@ class Accident():
         print(f'  -  Accident is a {self.scale_accident} size scaled accident')
     
     def specify_norms(self):
+        """This function creates the norms to be evaluated for this accident. In the implementation the static norms are included. 
+           The function could be extended to include smarter logic that dynamically checks which norms are relevent for this accident.
+           For example, large scale accidents might involve different norms than small scale accidents. 
+           Additionaly the ordering of norms could be specified in this function."""
         self.norms = ['involves_damaging_movement', 'involves_element_from_road', 'involves_heavy_object', 'involves_heavy_object_and_road_element']
         self.n_norms = len(self.norms)
         
     def select_norm(self):
+        """This function corresponds to the inference step of selecting norms.
+           It randomly selects one of the norms to evaluate. 
+           If no more norms are left to evaluate it updated appropriate fields and return NaN."""
         norm = self.norms.pop(random.randint(0,len(self.norms)-1))
         if len(self.norms) == 0:
             self.norms_to_evaluate = False
@@ -343,6 +368,7 @@ class Accident():
         return norm
     
     def evaluate_norm(self, norm):
+        """For each specific norm the correspoding abstracted case value is evaluated."""
         if norm == 'involves_element_from_road':
             return self.involves_element_from_road
         elif norm == 'involves_heavy_object':
@@ -353,6 +379,11 @@ class Accident():
             return self.involves_damaging_movement
                    
     def match_norm_value(self, norm, norm_value):
+        """Based on the norm values obtained in the evaluation step, 
+        the norm values are matched to a decision in this function.
+        
+        This logic could be further extended to allow for more complicated accidents to be analyzed.
+        If no decision can be made, the result of the assesment is 'undecided'."""
         if norm == 'involves_element_from_road':
             if norm_value==True:
                 self.expected_damage_level = 'medium'
@@ -369,6 +400,14 @@ class Accident():
                 self.assesment_complete = True
 
     def assesment_task_assess_damage_level(self, print_log=False):
+        """This function is the high level assesment task and follows 
+           the control flow as described in the report.
+           
+           Developers have tried to stick as closely to the inference structure as possible 
+           to explicitely show which inference step is happing where.
+           
+           Optionally the logging can be printed to demonstrate the inner workings of the method. 
+           By default the logging is not printed"""
         if print_log:
             print('------------------------------------------------')
             print(BOLD+'Start assesment task to: determine expected damage level'+END)
@@ -403,6 +442,11 @@ class Accident():
 
 class Roadsegment():
     def __init__(self, roadsegment_dict, roadsegment_ID, data):
+        """The fundamental groundwork for the planning task was performed by introducing the Road segment class.
+           The road segment is a piece of the Dutch Highway system. 
+           
+           At initaliation the accidents that happened on a road segment are listed in the Roadsegment.accidents variable,
+           such that they are available for further analysis."""
         self.roadsegment = roadsegment_dict
         self.ID = roadsegment_ID
         
@@ -412,6 +456,7 @@ class Roadsegment():
         self.print_all_elements = False
     
     def print_roadsegment_details(self, fields_descriptions, fields_to_print):
+        """Printing function"""
         dict_descriptions_accidents, dict_descriptions_roadsegments, dict_descriptions_parties = fields_descriptions
         fields_to_print_accidents, fields_to_print_parties, fields_to_print_roadsegments = fields_to_print
         print(BOLD+'Road segment data'+END)
@@ -421,6 +466,7 @@ class Roadsegment():
         print('------------------------------------------------')
         
     def print_accidents_on_roadsegment_details(self, fields_descriptions, fields_to_print):
+        """Printing function"""
         dict_descriptions_accidents, dict_descriptions_roadsegments, dict_descriptions_parties = fields_descriptions
         fields_to_print_accidents, fields_to_print_parties, fields_to_print_roadsegments = fields_to_print
         print(BOLD+f'Accidents data ({self.n_accidents} accidents)'+END)
