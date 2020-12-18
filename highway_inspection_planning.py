@@ -13,6 +13,11 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 4)
 
 def import_data(foldername):
+    """Function to import all data from the BRON database and convert it from CSV format to Pandas DataFrames.
+       To make sure only accidents on highways are included, the filter for HECTOMETER is not empty is performed on accidents.
+       Additionaly the filter WEGNUMMER is not empty is performed to filter roadsegments that are part of highways.
+       
+       The reference files are stored as small conversion Pandas Dataframes and bundled into the ref_files dictionary"""
     txt = ".txt"
     accident_data_foldername = r"Accident data (Ongevallengegevens)"
     network_data_foldername = r"Network data (Netwerkgegevens)"
